@@ -61,8 +61,11 @@ Theta2_grad = zeros(size(Theta2));
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
 %
-h1 = sigmoid([ones(m, 1) X] * Theta1');
-predict_X = sigmoid([ones(m, 1) h1] * Theta2');
+
+z2 = [ones(m, 1) X] * Theta1';
+a2 = sigmoid(z2);
+z3 = [ones(m, 1) a2] * Theta2';
+predict_X = sigmoid(z3);
 
 recode_y = zeros(num_labels, m);
 for i =  1:m
@@ -74,32 +77,23 @@ Theta2_reg = Theta2(:, 2:end);
 
 J = (1 / m) * sum(sum(-recode_y' .* log(predict_X) - (1 - recode_y') .* log(1 - predict_X))) + (lambda / (2 * m)) * (sum(sum(Theta1_reg .* Theta1_reg)) + sum(sum(Theta2_reg .* Theta2_reg)));
 
+for i = 1:m
+    sigma_3 = (predict_X(i, :) - recode_y(:, i)')';
+    sigma_2 = Theta2' * sigma_3 .* [1; sigmoidGradient(z2(i, :))'];
+    sigma_2 = sigma_2(2:end, :);
+    Theta2_grad = Theta2_grad + sigma_3 * [1, a2(i, :)];
+    Theta1_grad = Theta1_grad + sigma_2 * [1, X(i, :)];
+end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Theta1_grad(:, 2:end) = Theta1_grad(:, 2:end) / m + Theta1(:, 2:end) * lambda / m ;
+Theta2_grad(:, 2:end) = Theta2_grad(:, 2:end) / m + Theta2(:, 2:end) * lambda / m ;
+Theta1_grad(: ,1) = Theta1_grad(: ,1) / m ;
+Theta2_grad(:, 1) = Theta2_grad(: ,1) / m ;
 % -------------------------------------------------------------
 
 % =========================================================================
 
 % Unroll gradients
 grad = [Theta1_grad(:) ; Theta2_grad(:)];
-
 
 end
