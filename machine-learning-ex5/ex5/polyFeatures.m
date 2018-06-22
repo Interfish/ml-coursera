@@ -14,10 +14,9 @@ X_poly = zeros(numel(X), p);
 %               column of X contains the values of X to the p-th power.
 %
 %
-X_ploy = X;
-for i = 2:p
+for i = 1:p
     X_delta = X .^ i;
-    X_ploy = [X_ploy, X_delta];
+    X_poly(:, i) = X_delta;
 end
 % =========================================================================
 end
